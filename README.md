@@ -11,6 +11,7 @@ git clone --depth=1 https://github.com/varnav/zvdl2json.git
 cd zvdl2json
 mkdir /opt/zvdl2json
 cp zvdl2json.py /opt/zvdl2json
+chmod +x /opt/zvdl2json/zvdl2json.py
 cp zvdl2json.service /etc/systemd/system/zvdl2json.service
 systemctl daemon-reload
 ```
@@ -29,7 +30,7 @@ Change station ID to your own:
 `KJFK` - nearest airport
 
 ```shell
-dumpvdl2 --rtlsdr 0 --gain 35 --station-id JD-KJFK-VDL2 --msg-filter all,-avlc_s,-acars_nodata,-gsif,-x25_control,-idrp_keepalive,-esis --output decoded:json:zmq:mode=client,endpoint=tcp://192.168.50.204:5555 136725000 136975000 136875000
+dumpvdl2 --rtlsdr 0 --gain 35 --station-id JD-KJFK-VDL2 --msg-filter all,-avlc_s,-acars_nodata,-gsif,-x25_control,-idrp_keepalive,-esis --output decoded:json:zmq:mode=client,endpoint=tcp://127.0.0.1:5555 136725000 136975000 136875000
 ```
 
 ## Installation of dumpvdl2
