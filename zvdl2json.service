@@ -1,0 +1,16 @@
+# /etc/systemd/system/zvdl2json.service
+
+[Unit]
+Description=Runs zvdl2json as a service
+Documentation=https://github.com/varnav/zvdl2json/
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type = exec
+ExecStart=/usr/bin/python3 /opt/zvdl2json/zvdl2json.py
+#StandardInput=tty-force
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
