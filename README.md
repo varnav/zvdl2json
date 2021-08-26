@@ -58,6 +58,14 @@ nano /etc/default/
 
 See example on top for options
 
+## Get collected positions into CSV for plotting
+
+```shell
+adsc_get_position < 2021-08-26_14ads.txt | cut -d ' '  -f 3 | sed -z 's/\n/,/g;s/,$/\n/' | cut -d , -f 2,3,4 >> ~/positions.csv
+./ads-c_plot.py
+```
+
 ## See also
 
 https://github.com/mylk/acars-server
+http://www.hoka.it/oldweb/tech_info/systems/acarslabel.htm
