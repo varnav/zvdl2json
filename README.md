@@ -60,12 +60,15 @@ See example on top for options
 
 ## Get collected positions into CSV for plotting
 
+14 is hour
+
 ```shell
-adsc_get_position < 2021-08-26_14ads.txt | cut -d ' '  -f 3 | sed -z 's/\n/,/g;s/,$/\n/' | cut -d , -f 2,3,4 >> ~/positions.csv
-./ads-c_plot.py
+adsc_get_position < ~/2021-08-26_15ads.txt | cut -d ' '  -f 3 | sed '1~5s/.*/NL/' | tr '\n' ',' | tr 'NL' '\n' | cut -d ',' -f 2,3,4,5 | grep -v "^$" > ~/positions_15.csv
+./ads-c_plot.py 15
 ```
 
 ## See also
 
 https://github.com/mylk/acars-server
+
 http://www.hoka.it/oldweb/tech_info/systems/acarslabel.htm

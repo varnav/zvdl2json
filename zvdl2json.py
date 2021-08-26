@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
 
+import csv
 import datetime
 import json
-import zmq
-import csv
 import os
+from pathlib import Path
+import socket
+import zmq
 
 context = zmq.Context()
-socket = context.socket(zmq.SUB)
+s = context.socket(zmq.SUB)
 binding = 'tcp://*:5555'
-socket.bind(binding)
+s.bind(binding)
 print(datetime.datetime.now(), 'ZMQ listening at:', binding)
-socket.setsockopt_string(zmq.SUBSCRIBE, '')
+s.setsockopt_string(zmq.SUBSCRIBE, '')
 
 # Get homedir
-from pathlib import Path
 
 homedir = str(Path.home()) + os.path.sep
 print(datetime.datetime.now(), 'Dumping data to:', homedir)
 
 while True:
-    string = socket.recv_string()
+    string = s.recv_string()
     print(string)
     try:
         data = json.loads(string)
@@ -33,6 +34,9 @@ while True:
             'icao': int(data['vdl2']['avlc']['src']['addr'], 16),
             'toaddr': int(data['vdl2']['avlc']['dst']['addr'], 16)
         }
+
+        if 'text' in data['vdl2']:
+            flat['text'] = data['vdl2']['text']
 
         if 'acars' in data['vdl2']['avlc']:
             if len(data['vdl2']['avlc']['acars']['msg_text']) < 1:
@@ -48,8 +52,19 @@ while True:
             flat['flight'] = data['vdl2']['avlc']['acars']['flight']
             flat['msgno'] = data['vdl2']['avlc']['acars']['msg_num']
             flat['text'] = data['vdl2']['avlc']['acars']['msg_text']
+        if len(data['vdl2']['station']) > 4:
+            flat['station_id'] = data['vdl2']['station']
 
         print(json.dumps(flat, indent=2))
+
+        # Send this via UDP
+
+        # try:
+        #     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP
+        #     sock.sendto(bytes(json.dumps(flat), "utf-8"), ('feed.acars.io', 5555))
+        # except OSError:
+        #     print('Error sending over UDP')
+
     except ValueError as err:
         print("Conversion error:", err)
     except KeyError as err:
@@ -57,7 +72,7 @@ while True:
 
     # Dump all non-empty ACARS messages to CSV
     if 'acars' in data['vdl2']['avlc']:
-        filename = homedir + datetime.datetime.now().strftime("%Y-%m-%d_%H") + '_messages.json'
+        filename = homedir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_messages.json'
         with open(filename, 'a', encoding='utf-8') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow([data['vdl2']['t']['sec'], data['vdl2']['avlc']['acars']['flight'], data['vdl2']['avlc']['acars']['msg_text']])
@@ -80,7 +95,7 @@ while True:
         # FANS - AT1 – CPDLC – aircraft controller directions or response from pilot (can be input or output)
         if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
             print('AT1 message')
-            filename = homedir + datetime.datetime.now().strftime("%Y-%m-%d_%H") + 'at1.txt'
+            filename = homedir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + 'at1.txt'
             with open(filename, 'a', encoding='utf-8') as f:
                 f.write(data['vdl2']['avlc']['acars']['msg_text'] + "\n")
 
@@ -88,7 +103,7 @@ while True:
         # ADS - ADS-C position report
         if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
             print('ADS message')
-            filename = homedir + datetime.datetime.now().strftime("%Y-%m-%d_%H") + 'ads.txt'
+            filename = homedir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + 'ads.txt'
             with open(filename, 'a', encoding='utf-8') as f:
                 f.write(data['vdl2']['avlc']['acars']['msg_text'] + "\n")
 
@@ -97,7 +112,7 @@ while True:
         regex = r'00 | 7A | A7 | B7 | C\d | M\d | Q.'
         if bool(re.search(regex, data['vdl2']['avlc']['acars']['label'])):
             print(data['vdl2']['avlc']['acars']['msg_text'])
-            filename = homedir + datetime.datetime.now().strftime("%Y-%m-%d_%H") + '_labels.json'
+            filename = homedir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_labels.json'
             with open(filename, 'a', encoding='utf-8') as f:
                 f.write(string + "\n")
 
@@ -105,12 +120,12 @@ while True:
         if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
             print('Coordinates found')
             print(data['vdl2']['avlc']['acars']['msg_text'])
-            filename = homedir + datetime.datetime.now().strftime("%Y-%m-%d_%H") + '_coordinates.json'
+            filename = homedir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_coordinates.json'
             with open(filename, 'a', encoding='utf-8') as f:
                 writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 writer.writerow([data['vdl2']['t']['sec'], data['vdl2']['avlc']['acars']['flight'], data['vdl2']['avlc']['acars']['msg_text']])
             # Save flightnumber, coordinates and altitude
-            filename = homedir + datetime.datetime.now().strftime("%Y-%m-%d_%H") + '_ac_positions.json'
+            filename = homedir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_ac_positions.json'
             with open(filename, 'a', encoding='utf-8') as f:
                 writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 lat = data['vdl2']['avlc']['acars']['msg_text']
