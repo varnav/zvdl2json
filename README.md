@@ -58,17 +58,20 @@ nano /etc/default/
 
 See example on top for options
 
-## Get collected positions into CSV for plotting
-
-14 is hour
+## Plot collected positions from CSV
 
 ```shell
-adsc_get_position < ~/2021-08-26_15ads.txt | cut -d ' '  -f 3 | sed '1~5s/.*/NL/' | tr '\n' ',' | tr 'NL' '\n' | cut -d ',' -f 2,3,4,5 | grep -v "^$" > ~/positions_15.csv
-./ads-c_plot.py 15
+./ads-c_plot.py ~/2021-08-27_14_adsc.csv
 ```
+
+## Note on optimal antenna length
+
+137 MHz means 1/4 antenna must be 521 mm long.
 
 ## See also
 
 https://github.com/mylk/acars-server
+
+https://www.pentestpartners.com/security-blog/introduction-to-acars/
 
 http://www.hoka.it/oldweb/tech_info/systems/acarslabel.htm
