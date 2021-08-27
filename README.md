@@ -7,8 +7,9 @@ Right now it attempts to output [vdlm2dec](https://github.com/TLeconte/vdlm2dec)
 
 ```shell
 cd /usr/src
-git clone --depth=1 https://github.com/varnav/zvdl2json.git
+git clone https://github.com/varnav/zvdl2json.git
 cd zvdl2json
+pip install -r requirements.txt
 mkdir /opt/zvdl2json
 cp zvdl2json.py /opt/zvdl2json
 chmod +x /opt/zvdl2json/zvdl2json.py
@@ -21,6 +22,10 @@ systemctl daemon-reload
 ```shell
 systemctl start zvdl2json && systemctl status zvdl2json
 ```
+
+# Update
+
+Run `update-zvdl2json.py`
 
 ## How to run dumpvdl
 
