@@ -8,6 +8,7 @@ Wants=network-online.target
 
 [Service]
 Type=exec
+ExecStartPre=/bin/sleep 60
 ExecStart=/usr/bin/python3 /opt/zvdl2json/zvdl2json.py
 #StandardInput=tty-force
 Restart=on-failure
