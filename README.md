@@ -51,6 +51,8 @@ You may use serial of the SDR dongle instead of `0`.
 ## Installation of dumpvdl2
 
 ```shell
+apt update
+apt install -y cmake rtl-sdr git cmake libusb-1.0-0-dev libtool librtlsdr-dev build-essential libglib2.0-dev pkg-config librtlsdr-dev libxml2-dev libzmq3-dev python3-zmq libsqlite3-dev sqlite3 
 cd /usr/src
 git clone --depth=1 https://github.com/szpajder/dumpvdl2.git
 cd dumpvdl2
@@ -84,12 +86,20 @@ See example on top for options
 
 137 MHz means 1/4 antenna must be 521 mm long.
 
+# TODO
+
+* MongoDB or ElasticSearch instead of dumping to text/csv
+
 ## See also
 
 https://github.com/mylk/acars-server
+
+https://thebaldgeek.github.io/
 
 https://www.pentestpartners.com/security-blog/introduction-to-acars/
 
 http://www.hoka.it/oldweb/tech_info/systems/acarslabel.htm
 
 https://thebaldgeek.github.io/vhf-vdl2.html
+
+https://github.com/fredclausen/docker-acarshub

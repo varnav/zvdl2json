@@ -6,11 +6,15 @@ import json
 import os
 import traceback
 from pathlib import Path
+from sty import fg
 
 import zmq
 
+__version__ = "0.1.0"
 verbose = False
+watch_regex = 'ACCIDENT|COCKPIT|COMPUTER|CABIN|CAPT|COLLISION|CAUTION|DISPATCH|DIVERT|DIVERSION|DIV|DRUG|EMERGENCY|FAILED|FIRE|GUESS|HELP|IPHONE|IPAD|IFE|INCIDENT|INFORM|KNOW|KEEPING|LASER|LOOK|MASK|MARSHALL|MEDICAL|OXYGEN|ODD|PILOT|PAX|PLZ|PLEASE|POLICE|PHONE|RIDE|RELEASE|REPORTED|RETRACTING|ROUTING|RESET|RETURN|SHIP|SMOKE|SHIP|SICK|SUGGEST|THREAT|THE|TAPS|TRAFFIC|USB|VOMIT|WHAT|WHY|WINDOW|WEATHER|WRN|WOULD|FAULT'
 
+os.system("")
 
 def bell():
     if os.name == 'nt':
@@ -19,6 +23,7 @@ def bell():
 
 
 def main():
+    print('zvdl2json', __version__)
     context = zmq.Context()
     s = context.socket(zmq.SUB)
     binding = 'tcp://*:5555'
@@ -95,7 +100,7 @@ def main():
         # Dump all non-empty ACARS messages to CSV
         if 'acars' in data['vdl2']['avlc']:
             msgtime = datetime.datetime.utcfromtimestamp(data['vdl2']['t']['sec']).isoformat() + 'Z'
-            print(msgtime, data['vdl2']['avlc']['acars']['reg'].replace('.', ''),  "===>\n", data['vdl2']['avlc']['acars']['msg_text'])
+            print(msgtime, data['vdl2']['avlc']['acars']['reg'].replace('.', ''), "===>\n", data['vdl2']['avlc']['acars']['msg_text'])
             filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_messages.csv'
             with open(workdir / filename, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
@@ -108,20 +113,20 @@ def main():
             with open(workdir / filename, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([data['vdl2']['t']['sec'], data['vdl2']['flight'], data['vdl2']['text']])
+            # Word watchist
+            if bool(re.search(watch_regex, data['vdl2']['text'])):
+                print('Interesting information found')
+                bell()
+                print(fg.yellow + data['vdl2']['text'] + fg.rs)
+                filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_interesting.json'
+                with open(workdir / filename, 'a', encoding='utf-8') as f:
+                    f.write(json.dumps(data) + "\n")
 
         # Look for interesting things in ACARS
 
         import re
 
         if 'acars' in data['vdl2']['avlc']:
-
-            # regex = r'.'
-            # if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
-            #     print('Possible flight plan!')
-            #     print(data['vdl2']['avlc']['acars']['msg_text'])
-            # filename = workdir + datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_messages.txt'
-            # with open(workdir / filename, 'a', encoding='utf-8') as f:
-            #     f.write(data['vdl2']['avlc']['acars']['msg_text'] + "\n")
 
             # ADS-C
 
@@ -189,11 +194,21 @@ def main():
                 with open(workdir / filename, 'a', encoding='utf-8') as f:
                     f.write(json.dumps(data) + "\n")
 
+            # Coordinates search
             regex = r'[S,N] \d\d\.\d{3,4} [W,E] \d\d\d\.\d\d|FPO\/\d\d|[N,S]\d\d\d\d.\d,[W,E]\d\d\d\d\d.\d|POS[N,S]'
             if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
                 print('Coordinates found in message')
-                #print(data['vdl2']['avlc']['acars']['msg_text'])
+                # print(data['vdl2']['avlc']['acars']['msg_text'])
                 filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_position_messages.json'
+                with open(workdir / filename, 'a', encoding='utf-8') as f:
+                    f.write(json.dumps(data) + "\n")
+
+            # Word watchist
+            if bool(re.search(watch_regex, data['vdl2']['avlc']['acars']['msg_text'])):
+                print('Interesting information found')
+                bell()
+                print(style.YELLOW + data['vdl2']['avlc']['acars']['msg_text'])
+                filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_interesting.json'
                 with open(workdir / filename, 'a', encoding='utf-8') as f:
                     f.write(json.dumps(data) + "\n")
 
