@@ -37,7 +37,7 @@ def main():
             print(json.dumps(data, indent=4))
 
         # Save everything
-        filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_all.json'
+        filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_all.json'
         with open(workdir / filename, 'a', encoding='utf-8') as f:
             f.write(json.dumps(data) + "\n")
 
@@ -94,8 +94,9 @@ def main():
 
         # Dump all non-empty ACARS messages to CSV
         if 'acars' in data['vdl2']['avlc']:
-            print(data['vdl2']['avlc']['acars']['reg'].replace('.', ''),  "===>\n", data['vdl2']['avlc']['acars']['msg_text'])
-            filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_messages.csv'
+            msgtime = datetime.datetime.utcfromtimestamp(data['vdl2']['t']['sec']).isoformat() + 'Z'
+            print(msgtime, data['vdl2']['avlc']['acars']['reg'].replace('.', ''),  "===>\n", data['vdl2']['avlc']['acars']['msg_text'])
+            filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_messages.csv'
             with open(workdir / filename, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([data['vdl2']['t']['sec'], data['vdl2']['avlc']['acars']['reg'].replace('.', ''), data['vdl2']['avlc']['acars']['msg_text']])
@@ -103,7 +104,7 @@ def main():
         # Dump all non-empty non-ACARS messages to CSV
         if 'text' in data['vdl2']:
             print(data['vdl2']['reg'], "===>\n", data['vdl2']['text'])
-            filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_messages.csv'
+            filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_messages.csv'
             with open(workdir / filename, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow([data['vdl2']['t']['sec'], data['vdl2']['flight'], data['vdl2']['text']])
@@ -118,7 +119,7 @@ def main():
             # if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
             #     print('Possible flight plan!')
             #     print(data['vdl2']['avlc']['acars']['msg_text'])
-            # filename = workdir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_messages.txt'
+            # filename = workdir + datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_messages.txt'
             # with open(workdir / filename, 'a', encoding='utf-8') as f:
             #     f.write(data['vdl2']['avlc']['acars']['msg_text'] + "\n")
 
@@ -127,17 +128,16 @@ def main():
             try:
                 if 'arinc622' in data['vdl2']['avlc']['acars']:
                     if data['vdl2']['avlc']['acars']['arinc622']['msg_type'] == 'adsc_msg':
-                        print('ADS-C message')
+                        print('ADS-C message detected, saving position')
                         # Reassemble time
                         t = datetime.datetime.utcfromtimestamp(data['vdl2']['t']['sec'])
                         mins = int(int(data['vdl2']['avlc']['acars']['arinc622']['adsc']['tags'][1]['basic_report']['ts_sec']) / 60)
-                        # ts = t.replace(minute=mins).timestamp()
-                        ts = t.replace(minute=mins).isoformat() + 'Z'  # Time is UTC (Zulu)
+                        ts = t.replace(minute=mins).isoformat() + 'Z'  # ISO time in UTC (Zulu)
                         tail = data['vdl2']['avlc']['acars']['reg'].replace('.', '')
                         lat = data['vdl2']['avlc']['acars']['arinc622']['adsc']['tags'][1]['basic_report']['lat']
                         lon = data['vdl2']['avlc']['acars']['arinc622']['adsc']['tags'][1]['basic_report']['lon']
                         alt = data['vdl2']['avlc']['acars']['arinc622']['adsc']['tags'][1]['basic_report']['alt']
-                        filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_positions.csv'
+                        filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_positions.csv'
                         with open(workdir / filename, 'a', encoding='utf-8', newline='') as f:
                             writer = csv.writer(f)
                             writer.writerow([ts, tail, lat, lon, alt])
@@ -155,7 +155,7 @@ def main():
             #             lat = data['vdl2']['avlc']['xid']['vdl_params']['ac_position']['lat']
             #
             #
-            #             filename = workdir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_adsc.csv'
+            #             filename = workdir + datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_adsc.csv'
             #             with open(workdir / filename, 'a', encoding='utf-8') as f:
             #                 writer = csv.writer(f)
             #                 writer.writerow([ts, tail, lat, lon, alt])
@@ -164,19 +164,19 @@ def main():
             #     print("VLD position decode error")
             #     traceback.print_exc()
 
-            regex = r'.AT1.'
-            # FANS - AT1 – CPDLC – aircraft controller directions or response from pilot (can be input or output)
-            if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
-                print('AT1 message')
-                filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + 'at1.txt'
-                with open(workdir / filename, 'a', encoding='utf-8') as f:
-                    f.write(data['vdl2']['avlc']['acars']['msg_text'] + "\n")
+            # regex = r'.AT1.'
+            # # FANS - AT1 – CPDLC – aircraft controller directions or response from pilot (can be input or output)
+            # if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
+            #     print('AT1 message')
+            #     filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + 'at1.txt'
+            #     with open(workdir / filename, 'a', encoding='utf-8') as f:
+            #         f.write(data['vdl2']['avlc']['acars']['msg_text'] + "\n")
 
             # regex = r'.ADS.'
             # # ADS - ADS-C position report
             # if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
             #     print('ADS message')
-            #     filename = workdir + datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + 'ads.txt'
+            #     filename = workdir + datetime.datetime.utcnow().strftime("%Y-%m-%d") + 'ads.txt'
             #     with open(filename, 'a', encoding='utf-8') as f:
             #         f.write(data['vdl2']['avlc']['acars']['msg_text'] + "\n")
 
@@ -185,20 +185,20 @@ def main():
             regex = r'00|7A|A7|B7|C\d|M\d|Q.'
             if bool(re.search(regex, data['vdl2']['avlc']['acars']['label'])):
                 print(data['vdl2']['avlc']['acars']['msg_text'])
-                filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_interesting.json'
+                filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_interesting.json'
                 with open(workdir / filename, 'a', encoding='utf-8') as f:
                     f.write(json.dumps(data) + "\n")
 
-            regex = r'[S,N] \d\d\.\d\d [W,E] \d\d\d\.\d\d|FPO\/\d\d|[N,S]\d\d\d\d.\d,[W,E]\d\d\d\d\d.\d|POS[N,S]'
+            regex = r'[S,N] \d\d\.\d{3,4} [W,E] \d\d\d\.\d\d|FPO\/\d\d|[N,S]\d\d\d\d.\d,[W,E]\d\d\d\d\d.\d|POS[N,S]'
             if bool(re.search(regex, data['vdl2']['avlc']['acars']['msg_text'])):
                 print('Coordinates found in message')
                 #print(data['vdl2']['avlc']['acars']['msg_text'])
-                filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_position_messages.json'
+                filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_position_messages.json'
                 with open(workdir / filename, 'a', encoding='utf-8') as f:
                     f.write(json.dumps(data) + "\n")
 
                 # Parse position and save to file
-                # filename = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H") + '_other_positions.json'
+                # filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_other_positions.json'
                 # with open(workdir / filename, 'a', encoding='utf-8') as f:
                 #     writer = csv.writer(f)
                 #     lat = data['vdl2']['avlc']['acars']['msg_text']
