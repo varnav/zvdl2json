@@ -12,7 +12,7 @@ import zmq
 
 __version__ = "0.1.0"
 verbose = False
-watch_regex = 'ACCIDENT|COCKPIT|COMPUTER|CABIN|CAPT|COLLISION|CAUTION|DISPATCH|DIVERT|DIVERSION|DIV|DRUG|EMERGENCY|FAILED|FIRE|GUESS|HELP|IPHONE|IPAD|IFE|INCIDENT|INFORM|KNOW|KEEPING|LASER|LOOK|MASK|MARSHALL|MEDICAL|OXYGEN|ODD|PILOT|PAX|PLZ|PLEASE|POLICE|PHONE|RIDE|RELEASE|REPORTED|RETRACTING|ROUTING|RESET|RETURN|SHIP|SMOKE|SHIP|SICK|SUGGEST|THREAT|THE|TAPS|TRAFFIC|USB|VOMIT|WHAT|WHY|WINDOW|WEATHER|WRN|WOULD|FAULT'
+watch_regex = 'ACCIDENT|COCKPIT|COMPUTER|CABIN|CAPT|COLLISION|CAUTION|DISPATCH|DIVER|DRUG|EMERGENCY|FAILED|FIRE|GUESS|HELP|PHONE|IPAD|IFE|INCIDENT|INFORM|KNOW|KEEPING|LASER|LOOK|MASK|MARSHALL|MEDICAL|OXYGEN|ODD|PILOT|PAX|PLZ|PLEASE|POLICE|PHONE|RIDE|RELEASE|REPORTED|RETRACTING|ROUTING|RESET|RETURN|SHIP|SMOKE|SHIP|SICK|SUGGEST|THREAT|THE|TAPS|TRAFFIC|USB|VOMIT|WHAT|WHY|WINDOW|WEATHER|WRN|WOULD|FAULT|sDISP\sMSG|LEO|GSC|NEED'
 
 os.system("")
 
@@ -104,15 +104,16 @@ def main():
             filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_messages.csv'
             with open(workdir / filename, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow([data['vdl2']['t']['sec'], data['vdl2']['avlc']['acars']['reg'].replace('.', ''), data['vdl2']['avlc']['acars']['msg_text']])
+                writer.writerow([msgtime, data['vdl2']['avlc']['acars']['reg'].replace('.', ''), data['vdl2']['avlc']['acars']['msg_text']])
 
         # Dump all non-empty non-ACARS messages to CSV
         if 'text' in data['vdl2']:
-            print(data['vdl2']['reg'], "===>\n", data['vdl2']['text'])
+            msgtime = datetime.datetime.utcfromtimestamp(data['vdl2']['t']['sec']).isoformat() + 'Z'
+            print(msgtime, data['vdl2']['reg'], "===>\n", data['vdl2']['text'])
             filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_messages.csv'
             with open(workdir / filename, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow([data['vdl2']['t']['sec'], data['vdl2']['flight'], data['vdl2']['text']])
+                writer.writerow([msgtime, data['vdl2']['flight'], data['vdl2']['text']])
             # Word watchist
             if bool(re.search(watch_regex, data['vdl2']['text'])):
                 print('Interesting information found')

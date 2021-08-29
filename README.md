@@ -103,3 +103,5 @@ http://www.hoka.it/oldweb/tech_info/systems/acarslabel.htm
 https://thebaldgeek.github.io/vhf-vdl2.html
 
 https://github.com/fredclausen/docker-acarshub
+
+https://github.com/aerospaceresearch/CalibrateSDR
