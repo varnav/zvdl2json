@@ -12,7 +12,7 @@ import zmq
 
 __version__ = "0.1.0"
 verbose = False
-watch_regex = 'ACCIDENT|COCKPIT|COMPUTER|CABIN|CAPT|COLLISION|CAUTION|DISPATCH|DIVER|DRUG|EMERGENCY|FAILED|FIRE|GUESS|HELP|PHONE|IPAD|IFE|INCIDENT|INFORM|KNOW|KEEPING|LASER|LOOK|MASK|MARSHALL|MEDICAL|OXYGEN|ODD|PILOT|PAX|PLZ|PLEASE|POLICE|PHONE|RIDE|RELEASE|REPORTED|RETRACTING|ROUTING|RESET|RETURN|SHIP|SMOKE|SHIP|SICK|SUGGEST|THREAT|THE|TAPS|TRAFFIC|USB|VOMIT|WHAT|WHY|WINDOW|WEATHER|WRN|WOULD|FAULT|sDISP\sMSG|LEO|GSC|NEED'
+watch_regex = 'ACCIDENT|COCKPIT|COMPUTER|CABIN|CAPT|COLLISION|CAUTION|DISPATCH|DIVER|DRUG|EMERGENCY|FAILED|FIRE|GUESS|HELP|PHONE|IPAD|IFE|INCIDENT|INFORM|KNOW|KEEPING|LASER|LOOK|MASK|MARSHALL|MEDICAL|OXYGEN|ODD|PILOT|PAX|PLZ|PLEASE|POLICE|PHONE|RIDE|RELEASE|REPORTED|RETRACTING|ROUTING|RESET|RETURN|SHIP|SMOKE|SHIP|SICK|SUGGEST|THREAT|TAPS|TRAFFIC|USB|VOMIT|WHAT|WHY|WINDOW|WEATHER|WRN|WOULD|FAULT|DISP|LEO|GSC|NEED|LIFE|URGENT|FREE|TEXT|CAPT|SIGHT'
 
 os.system("")
 
@@ -208,7 +208,7 @@ def main():
             if bool(re.search(watch_regex, data['vdl2']['avlc']['acars']['msg_text'])):
                 print('Interesting information found')
                 bell()
-                print(style.YELLOW + data['vdl2']['avlc']['acars']['msg_text'])
+                print(fg.YELLOW + data['vdl2']['avlc']['acars']['msg_text'] | fg.rs)
                 filename = datetime.datetime.utcnow().strftime("%Y-%m-%d") + '_interesting.json'
                 with open(workdir / filename, 'a', encoding='utf-8') as f:
                     f.write(json.dumps(data) + "\n")

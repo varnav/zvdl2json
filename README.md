@@ -79,7 +79,7 @@ See example on top for options
 ## Plot collected positions from CSV
 
 ```shell
-./ads-c_plot.py ~/zvdl2json/2021-08-28_adsc.csv
+./ads-c_plot.py ~/zvdl2json/2021-08-28_positions.csv
 ```
 
 ## Note on optimal antenna length
@@ -105,3 +105,5 @@ https://thebaldgeek.github.io/vhf-vdl2.html
 https://github.com/fredclausen/docker-acarshub
 
 https://github.com/aerospaceresearch/CalibrateSDR
+
+https://github.com/projecthorus/radiosonde_auto_rx/
