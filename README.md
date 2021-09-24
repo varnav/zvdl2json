@@ -15,6 +15,7 @@ Right now it attempts to output [vdlm2dec](https://github.com/TLeconte/vdlm2dec)
 
 ```shell
 sudo -i
+apt install -y python3-pip
 cd /usr/src
 git clone https://github.com/varnav/zvdl2json.git
 cd zvdl2json
