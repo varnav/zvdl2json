@@ -14,6 +14,7 @@ Right now it attempts to output [vdlm2dec](https://github.com/TLeconte/vdlm2dec)
 ## Install
 
 ```shell
+sudo -i
 cd /usr/src
 git clone https://github.com/varnav/zvdl2json.git
 cd zvdl2json
@@ -23,6 +24,7 @@ cp zvdl2json.py /opt/zvdl2json
 chmod +x /opt/zvdl2json/zvdl2json.py
 cp zvdl2json.service /etc/systemd/system/zvdl2json.service
 systemctl daemon-reload
+systemctl enable zvdl2json
 ```
 
 ## Run 
