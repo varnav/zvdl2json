@@ -5,6 +5,8 @@ This daemon will receive ZMQ input from [dumpvdl2](https://github.com/szpajder/d
 ## Install
 
 ```shell
+sudo -i
+apt install -y python3-pip
 cd /usr/src
 git clone https://github.com/varnav/zvdl2json.git
 cd zvdl2json
@@ -33,7 +35,18 @@ Change station ID to your own:
 dumpvdl2 --rtlsdr 0 --station-id JD-KJFK-VDL2 --bs-db /root/BaseStation.sqb --msg-filter all,-avlc_s,-acars_nodata,-gsif,-x25_control,-idrp_keepalive,-esis --output decoded:json:zmq:mode=client,endpoint=tcp://127.0.0.1:5555 136650000 136700000 136800000 136975000
 ```
 
-You may use serial of the SDR dongle instead of `0`.
+You may use serial of the SDR dongle instead of `0`. Frequencies:
+
+```
+136.650 USA (ARINC)
+136.700 USA (ARINC)
+136.800 USA (SITA)
+136.725 Europe (ARINC)
+136.775 Europe (SITA)
+136.825 Europe (ARINC)
+136.875 Europe (SITA)
+136.975 Worldwide (SITA & ARINC)
+```
 
 ## Installation of dumpvdl2
 
