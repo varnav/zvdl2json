@@ -6,7 +6,8 @@ This daemon will receive ZMQ input from [dumpvdl2](https://github.com/szpajder/d
 
 ```shell
 sudo -i
-apt install -y python3-pip
+apt update
+apt install -y python3-pip git
 cd /usr/src
 git clone https://github.com/varnav/zvdl2json.git
 cd zvdl2json
