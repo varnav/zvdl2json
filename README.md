@@ -23,7 +23,7 @@ systemctl status zvdl2json
 
 # Update
 
-Run `update-zvdl2json.py`
+Run `tools/update-zvdl2json.sh`
 
 ## How to run dumpvdl
 
