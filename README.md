@@ -2,6 +2,10 @@
 
 This daemon will receive ZMQ input from [dumpvdl2](https://github.com/szpajder/dumpvdl2/) and output [vdlm2dec](https://github.com/TLeconte/vdlm2dec) compatible JSON for feeding to [airframes.io](https://airframes.io).
 
+## Archived
+
+This tool is not needed anymore as airframes.io has [native support](https://app.airframes.io/about) for dumpvdl2 format now.
+
 ## Install
 
 ```shell
